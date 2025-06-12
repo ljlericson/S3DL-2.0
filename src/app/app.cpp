@@ -57,6 +57,7 @@ app::~app()
 
 void app::loop()
 {   
+    // Hello GitHub!
     ImGuiIO& io = ImGui::GetIO();
 
     s3gl::mesh cube("assets/obj/torus.obj", "assets/tex/2.jpg", "src/shaders/frag.glsl", "src/shaders/vert.glsl", 0, glm::vec3(3.0f, 3.0f, -3.0f));
