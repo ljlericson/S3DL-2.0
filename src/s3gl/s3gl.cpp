@@ -97,7 +97,9 @@ s3gl::exception::exception(const std::string& except)
 
 std::string s3gl::exception::what()
 {
-    return except;
+    std::stringstream str;
+    str << "|[FATAL ERROR]| e.what(): " << except;
+    return str.str();
 }
 
 

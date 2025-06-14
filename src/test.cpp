@@ -2,8 +2,15 @@
 
 int main(int argc, char* argv[])
 {
-    app game; 
-    game.loop();
-        
+    try
+    {
+        app game; 
+        game.loop();
+    }
+    catch(s3gl::exception e)
+    {
+        std::cout << e.what() << '\n';
+    }
+    
     return 0;
 }
