@@ -2,7 +2,6 @@
 
 app::app()
 {
-    throw s3gl::exception("Failed to init glfw\n");
     // init glfw but not glew and gl
     if(s3gl::init(s3gl::INIT_GLFW) != 0)
     {
