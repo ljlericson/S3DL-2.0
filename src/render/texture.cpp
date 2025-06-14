@@ -25,10 +25,10 @@ s3gl::texture::texture(const char* fpath, GLuint tex_unit, GLuint target)
     }
 }
 
-void s3gl::texture::set_param(GLuint pname, GLuint param)
+void s3gl::texture::set_param(GLuint pname, GLuint params)
 {
     glBindTexture(target, id); // ensure texture is bound before setting parameters
-    glTexParameteri(target, pname, param);
+    glTexParameteri(target, pname, params);
 }
 
 void s3gl::texture::bind(GLuint shad_program)
