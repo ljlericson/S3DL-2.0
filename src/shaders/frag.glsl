@@ -33,7 +33,6 @@ vec4 point_light()
     float spec_amout = pow(max(dot(view_dir, reflection_dir), 0.0f), 8);
     float specular = spec_amout * spec_light;
     float maxs = max(diffuse * intern, ambient);
-
     vec4 light_colv = light_col;
     if(maxs == 0.1f)
         light_colv = vec4(1.0f);

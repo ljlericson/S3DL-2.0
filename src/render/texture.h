@@ -9,6 +9,7 @@ namespace s3gl
         // weird opengl stuff
         GLuint id;
         GLuint target;
+        GLuint tex_unit;
         // texture info
         int t_width, 
             t_height, 

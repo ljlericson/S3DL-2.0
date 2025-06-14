@@ -34,7 +34,7 @@ app::app()
     // white burns my eyes
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 330");
+    ImGui_ImplOpenGL3_Init("#version 410");
     glEnable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_DEPTH_TEST);      // Always use this with culling
@@ -60,7 +60,7 @@ void app::loop()
     // Hello GitHub!
     ImGuiIO& io = ImGui::GetIO();
 
-    s3gl::mesh cube("assets/obj/torus.obj", "assets/tex/2.jpg", "src/shaders/frag.glsl", "src/shaders/vert.glsl", 0, glm::vec3(3.0f, 3.0f, -3.0f));
+    s3gl::mesh cube("assets/obj/torus.obj", "assets/tex/grass.png", "src/shaders/frag.glsl", "src/shaders/vert.glsl", 0, glm::vec3(3.0f, 3.0f, -3.0f));
     cube.link_atribute({0, 1, 2}, {3, 2, 3}, 8 * sizeof(float), {(void*)0, (void*)(3 * sizeof(float)), (void*)(6 * sizeof(float))});
     cube.set_tex_flags(s3gl::MESH_TEX_PRESET_1);
     s3gl::mesh cone("assets/obj/cone.obj", "assets/tex/2.jpg", "src/shaders/frag.glsl", "src/shaders/vert.glsl", 1, glm::vec3(-3.0f, -2.0f, 3.0f));
@@ -71,9 +71,13 @@ void app::loop()
     cone2.link_atribute({0, 1, 2}, {3, 2, 3}, 8 * sizeof(float), {(void*)0, (void*)(3 * sizeof(float)), (void*)(6 * sizeof(float))});
     cone2.set_tex_flags(s3gl::MESH_TEX_PRESET_1);
 
-    s3gl::mesh cube2("assets/obj/cube.obj", "assets/tex/2.jpg", "src/shaders/frag.glsl", "src/shaders/vert.glsl", 2, glm::vec3(-3.0f, -2.0f, -3.0f));
+    s3gl::mesh cube2("assets/obj/cube.obj", "assets/tex/2.jpg", "src/shaders/frag.glsl", "src/shaders/vert.glsl", 3, glm::vec3(-3.0f, -2.0f, -3.0f));
     cube2.link_atribute({0, 1, 2}, {3, 2, 3}, 8 * sizeof(float), {(void*)0, (void*)(3 * sizeof(float)), (void*)(6 * sizeof(float))});
     cube2.set_tex_flags(s3gl::MESH_TEX_PRESET_1);
+
+    s3gl::mesh land("assets/obj/mountains.obj", "assets/tex/grass.png", "src/shaders/frag.glsl", "src/shaders/vert.glsl", 4, glm::vec3(0.0f, -10.0f, 0.0f));
+    land.link_atribute({0, 1, 2}, {3, 2, 3}, 8 * sizeof(float), {(void*)0, (void*)(3 * sizeof(float)), (void*)(6 * sizeof(float))});
+    land.set_tex_flags(s3gl::MESH_TEX_PRESET_1);
 
     glm::vec4 light_col = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
     glm::vec3 light_pos = glm::vec3(2.0f, 2.0f, 2.0f);
@@ -101,12 +105,13 @@ void app::loop()
         
         if (!ImGui::GetIO().WantCaptureMouse)     
             cam.inputs(window);
-        cam.update_matrix(0.1f, 100.0f);
+        cam.update_matrix(0.1f, 10000.0f);
 
         cube.draw(cam, glm::vec3(light_pos), glm::vec4(light_col), light_preset);
         cone.draw(cam, glm::vec3(light_pos), glm::vec4(light_col), light_preset);
         cone2.draw(cam, glm::vec3(light_pos), glm::vec4(light_col), light_preset);
         cube2.draw(cam, glm::vec3(light_pos), glm::vec4(light_col), light_preset);
+        land.draw(cam, glm::vec3(light_pos), glm::vec4(light_col), light_preset);
         // ALL imgui rendering
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
