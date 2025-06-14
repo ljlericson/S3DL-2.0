@@ -84,6 +84,7 @@ void app::loop()
     float rot_speed = 0.0f;
 
     s3gl::camera cam(glm::vec3(0.0f, 0.0f, 2.0f));
+    int light_preset = s3gl::LIGHTING_DIRECT;
     cam.fov = 90.0f;
 
     while(!glfwWindowShouldClose(window))
@@ -102,10 +103,10 @@ void app::loop()
             cam.inputs(window);
         cam.update_matrix(0.1f, 100.0f);
 
-        cube.draw(cam, glm::vec3(light_pos), glm::vec4(light_col));
-        cone.draw(cam, glm::vec3(light_pos), glm::vec4(light_col));
-        cone2.draw(cam, glm::vec3(light_pos), glm::vec4(light_col));
-        cube2.draw(cam, glm::vec3(light_pos), glm::vec4(light_col));
+        cube.draw(cam, glm::vec3(light_pos), glm::vec4(light_col), light_preset);
+        cone.draw(cam, glm::vec3(light_pos), glm::vec4(light_col), light_preset);
+        cone2.draw(cam, glm::vec3(light_pos), glm::vec4(light_col), light_preset);
+        cube2.draw(cam, glm::vec3(light_pos), glm::vec4(light_col), light_preset);
         // ALL imgui rendering
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -126,7 +127,16 @@ void app::loop()
         ImGui::SliderFloat3("Light Pos", a, -10.0f, 10.0f);
         ImGui::Checkbox("Grounded", &cam.grounded);
         ImGui::End();
-
+        // lighting
+        ImGui::Begin("Lighting");
+        if(ImGui::Button("Low Graphics"))
+            light_preset = s3gl::LIGHTING_NOLIGHT;
+        else if(ImGui::Button("Direct Light"))
+            light_preset = s3gl::LIGHTING_DIRECT;
+        else if(ImGui::Button("Point Light"))
+            light_preset = s3gl::LIGHTING_POINT;
+        ImGui::End();
+        //fps
         ImGui::Begin("FPS");
         ImGui::Text("%d", s3gl::calc_fps());
         ImGui::End();

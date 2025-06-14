@@ -28,6 +28,6 @@ namespace s3gl
 
         void set_tex_flags(GLuint pname, GLuint params);
 
-        void draw(camera& cam, const glm::vec3& light_pos, const glm::vec4& light_col);
+        void draw(camera& cam, const glm::vec3& light_pos, const glm::vec4& light_col, int light_preset);
     };
 }

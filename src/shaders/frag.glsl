@@ -6,6 +6,7 @@ in vec2 texCoord;
 in vec3 normal;
 in vec3 crnt_pos;
 
+uniform int light_preset;
 uniform sampler2D tex0;
 uniform vec3 cam_pos;
 uniform vec4 light_col;
@@ -21,6 +22,7 @@ vec4 point_light()
 
     float ambient = 0.10f;
 
+
     vec3 normaln = normalize(normal);
     vec3 light_dir = normalize(light_pos - crnt_pos);
     float diffuse = max(dot(normaln, light_dir), 0.0f);
@@ -30,8 +32,12 @@ vec4 point_light()
     vec3 reflection_dir = reflect(-light_dir, normaln);
     float spec_amout = pow(max(dot(view_dir, reflection_dir), 0.0f), 8);
     float specular = spec_amout * spec_light;
+    float maxs = max(diffuse * intern, ambient);
 
-    return texture(tex0, texCoord) * (max(diffuse * intern, ambient) + specular * intern) * light_col;
+    vec4 light_colv = light_col;
+    if(maxs == 0.1f)
+        light_colv = vec4(1.0f);
+    return (texture(tex0, texCoord) * max(diffuse * intern, ambient) + specular * intern) * light_colv;
 }
 
 vec4 direct_light()
@@ -48,35 +54,7 @@ vec4 direct_light()
     float spec_amout = pow(max(dot(view_dir, reflection_dir), 0.0f), 8);
     float specular = spec_amout * spec_light;
 
-    return texture(tex0, texCoord) * max(diffuse, ambient) + specular * light_col;
-}
-
-vec4 spotLight()
-{
-	// controls how big the area that is lit up is
-	float outerCone = 0.90f;
-	float innerCone = 0.95f;
-
-	// ambient lighting
-	float ambient = 0.20f;
-
-	// diffuse lighting
-	vec3 normaln = normalize(normal);
-	vec3 lightDirection = normalize(light_pos - crnt_pos);
-	float diffuse = max(dot(normaln, lightDirection), 0.0f);
-
-	// specular lighting
-	float specularLight = 0.50f;
-	vec3 viewDirection = normalize(cam_pos - crnt_pos);
-	vec3 reflectionDirection = reflect(-lightDirection, normaln);
-	float specAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 16);
-	float specular = specAmount * specularLight;
-
-	// calculates the intensity of the crntPos based on its angle to the center of the light cone
-	float angle = dot(vec3(0.0f, -1.0f, 0.0f), -lightDirection);
-	float inten = clamp((angle - outerCone) / (innerCone - outerCone), 0.0f, 1.0f);
-
-	return (texture(tex0, texCoord) * (diffuse * inten + ambient) + specular * inten) * lightColor;
+    return (texture(tex0, texCoord) * max(diffuse, ambient) + specular) * light_col;
 }
 
 vec4 no_light()
@@ -86,6 +64,11 @@ vec4 no_light()
 
 void main()
 {
-    FragColor = spotLight();
+    if(light_preset == 0)
+        FragColor = no_light();
+    if(light_preset == 1)
+        FragColor = direct_light();
+    if(light_preset == 2)
+        FragColor = point_light();
     FragColor.w = 1.0f;
 }

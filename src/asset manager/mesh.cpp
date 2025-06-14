@@ -132,7 +132,7 @@ void s3gl::mesh::set_tex_flags(int preset)
     }
 }
 
-void s3gl::mesh::draw(camera& cam, const glm::vec3& light_pos, const glm::vec4& light_col)
+void s3gl::mesh::draw(camera& cam, const glm::vec3& light_pos, const glm::vec4& light_col, int light_preset)
 {
     if(has_init)
     {
@@ -159,6 +159,12 @@ void s3gl::mesh::draw(camera& cam, const glm::vec3& light_pos, const glm::vec4& 
         if(loc4 == -1)
             std::cout << "Couldn't find model loc\n";
         glUniformMatrix4fv(loc4, 1, GL_FALSE, glm::value_ptr(model));
+
+        GLuint loc5 = glGetUniformLocation(shad.id, "light_preset");
+        if(loc4 == -1)
+            std::cout << "Couldn't find model loc\n";
+        glUniform1i(loc5, light_preset - 0x20);
+
 
         cam.matrix(shad, "camMat");
         objTex.bind();

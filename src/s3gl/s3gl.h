@@ -53,7 +53,11 @@ namespace s3gl
         INIT_GLFW = 0x00,
         INIT_GLEW = 0x01,
 
-        MESH_TEX_PRESET_1 = 0x11
+        MESH_TEX_PRESET_1 = 0x11,
+
+        LIGHTING_NOLIGHT = 0x20,
+        LIGHTING_DIRECT = 0x21,
+        LIGHTING_POINT = 0x22,
     } s3gl;
 
 
