@@ -159,7 +159,6 @@ float s3gl::mesh::get_height_data(glm::vec3 pos)
     float min_dist_squared = std::numeric_limits<float>::max();
     float y_close = 0.0f;
 
-    std::cout << m_verts.size() << '\n';
     for (const auto& vert : m_verts) 
     {
         float dx = vert.x - pos.x;

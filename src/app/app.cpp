@@ -75,7 +75,7 @@ void app::loop()
     cube2.link_atribute({0, 1, 2}, {3, 2, 3}, 8 * sizeof(float), {(void*)0, (void*)(3 * sizeof(float)), (void*)(6 * sizeof(float))});
     cube2.set_tex_flags(s3gl::MESH_TEX_PRESET_1);
 
-    s3gl::mesh land("assets/obj/mountains.obj", "assets/tex/grass.png", "src/shaders/frag.glsl", "src/shaders/vert.glsl", 4, glm::vec3(0.0f, -10.0f, 0.0f));
+    s3gl::mesh land("assets/obj/bigland.obj", "assets/tex/grass.png", "src/shaders/frag.glsl", "src/shaders/vert.glsl", 4, glm::vec3(0.0f, -10.0f, 0.0f));
     land.link_atribute({0, 1, 2}, {3, 2, 3}, 8 * sizeof(float), {(void*)0, (void*)(3 * sizeof(float)), (void*)(6 * sizeof(float))});
     land.set_tex_flags(s3gl::MESH_TEX_PRESET_1);
 
@@ -104,7 +104,7 @@ void app::loop()
         cam.speed = rot_speed;
         
         if (!ImGui::GetIO().WantCaptureMouse)     
-            cam.inputs(window);
+            cam.inputs(window, land.get_height_data(cam.pos) - 5.0f);
         cam.update_matrix(0.1f, 10000.0f);
 
         cube.draw(cam, glm::vec3(light_pos), glm::vec4(light_col), light_preset);
@@ -113,7 +113,6 @@ void app::loop()
         cube2.draw(cam, glm::vec3(light_pos), glm::vec4(light_col), light_preset);
         land.draw(cam, glm::vec3(light_pos), glm::vec4(light_col), light_preset);
 
-        cam.pos.y = land.get_height_data(cam.pos) - 5.0f;
         // ALL imgui rendering
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();

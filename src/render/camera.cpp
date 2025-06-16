@@ -34,7 +34,7 @@ void s3gl::camera::matrix(const shader& shad, const char* uniform)
 
 
 // not my code!!!!
-void s3gl::camera::inputs(GLFWwindow* window)
+void s3gl::camera::inputs(GLFWwindow* window, float height_data)
 {
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
@@ -58,25 +58,23 @@ void s3gl::camera::inputs(GLFWwindow* window)
 	{
         pos += speed * glm::normalize(glm::cross(orientation, up));
 	}
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && !jump)
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && !jump && grounded)
 	{
         jump = true;
         first_jump = true;
-        yOriginal = pos.y;
 	}
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
     {
-        // speed *= 1.6f;
-        jump = false;
+        speed *= 1.6f;
     }
     
     // handles jumping (the one bit of code i made)
     // Handles key inputs
-    if(jump)
+    if(jump && grounded)
     {
-        if(pos.y <= yOriginal && !first_jump)
+        if(pos.y <= height_data && !first_jump)
         {
-            pos.y = yOriginal;
+            pos.y = height_data;
             jump = false;
             jump_ticks = 0;
         }
@@ -86,7 +84,11 @@ void s3gl::camera::inputs(GLFWwindow* window)
             jump_ticks ++;
         }
         first_jump = false;
-    } 
+    }
+    else if(grounded)
+    {
+        pos.y = height_data;
+    }
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
 	{
