@@ -75,6 +75,8 @@ s3gl::mesh::mesh(const std::string& objfpath, const std::string& texfpath, const
             vert_data.push_back(verticies[i].v.x);
             vert_data.push_back(verticies[i].v.y);
             vert_data.push_back(verticies[i].v.z);
+        
+            m_verts.push_back(glm::vec3(verticies[i].v));
 
             vert_data.push_back(verticies[i].norm.x);
             vert_data.push_back(verticies[i].norm.y);
@@ -130,6 +132,48 @@ void s3gl::mesh::set_tex_flags(int preset)
         objTex.set_param(GL_TEXTURE_WRAP_T, GL_REPEAT);
         break;
     }
+}
+
+// float s3gl::mesh::get_height_data(glm::vec2 pos)
+// {
+//     float min_dist_squared = std::numeric_limits<float>::max();
+//     float y_close = 0.0f;
+
+//     for (const auto& vert : m_verts) 
+//     {
+//         float dx = vert.x - pos.x;
+//         float dz = vert.z - pos.y;
+//         float dist_squared = dx * dx + dz * dz;
+
+//         if (dist_squared < min_dist_squared) 
+//         {
+//             min_dist_squared = dist_squared;
+//             y_close = vert.y;
+//         }
+//     }
+//     return y_close;
+// }
+
+float s3gl::mesh::get_height_data(glm::vec3 pos)
+{
+    float min_dist_squared = std::numeric_limits<float>::max();
+    float y_close = 0.0f;
+
+    std::cout << m_verts.size() << '\n';
+    for (const auto& vert : m_verts) 
+    {
+        float dx = vert.x - pos.x;
+        float dy = vert.y - pos.y;
+        float dz = vert.z - pos.z;
+        float dist_squared = dx * dx + dy * dy + dz * dz;
+
+        if (dist_squared < min_dist_squared) 
+        {
+            min_dist_squared = dist_squared;
+            y_close = vert.y;
+        }
+    }
+    return y_close;
 }
 
 void s3gl::mesh::draw(camera& cam, const glm::vec3& light_pos, const glm::vec4& light_col, int light_preset)

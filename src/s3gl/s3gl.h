@@ -22,6 +22,8 @@
 #include <sstream>
 #include <vector>
 #include <array>
+#include <limits>
+#include <cmath>
 // opengl
 #include <GL/glew.h>
 #include <glfw/glfw3.h>
@@ -58,7 +60,7 @@ namespace s3gl
         LIGHTING_NOLIGHT = 0x20,
         LIGHTING_DIRECT = 0x21,
         LIGHTING_POINT = 0x22,
-    } s3gl;
+    } engine;
 
 
     int init(int flags);

@@ -8,6 +8,7 @@ namespace s3gl
         // vertex data
         std::size_t num_verts;
         std::vector<float> vert_data;
+        std::vector<glm::vec3> m_verts;
         // texture data
         texture objTex;
         // vertex buffer objects
@@ -27,6 +28,8 @@ namespace s3gl
         void set_tex_flags(int preset);
 
         void set_tex_flags(GLuint pname, GLuint params);
+
+        float get_height_data(glm::vec3 pos);
 
         void draw(camera& cam, const glm::vec3& light_pos, const glm::vec4& light_col, int light_preset);
     };

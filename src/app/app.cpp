@@ -82,7 +82,7 @@ void app::loop()
     glm::vec4 light_col = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
     glm::vec3 light_pos = glm::vec3(2.0f, 2.0f, 2.0f);
 
-    float b[3] = {0.0f, 0.0f, 0.0f};
+    float b[3] = {135.0f / 255.0f, 234.0f / 255.0f, 255.0f / 255.0f};
     float b2[3] = {1.0f, 1.0f, 1.0f};
     float a[3] = {2.0f, 2.0f, 2.0f};
     float rot_speed = 0.0f;
@@ -112,6 +112,8 @@ void app::loop()
         cone2.draw(cam, glm::vec3(light_pos), glm::vec4(light_col), light_preset);
         cube2.draw(cam, glm::vec3(light_pos), glm::vec4(light_col), light_preset);
         land.draw(cam, glm::vec3(light_pos), glm::vec4(light_col), light_preset);
+
+        cam.pos.y = land.get_height_data(cam.pos) - 5.0f;
         // ALL imgui rendering
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
