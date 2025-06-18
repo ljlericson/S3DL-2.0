@@ -75,7 +75,7 @@ void app::loop()
     cube2.link_atribute({0, 1, 2}, {3, 2, 3}, 8 * sizeof(float), {(void*)0, (void*)(3 * sizeof(float)), (void*)(6 * sizeof(float))});
     cube2.set_tex_flags(s3gl::MESH_TEX_PRESET_1);
 
-    s3gl::mesh land("assets/obj/bigland.obj", "assets/tex/grass.png", "src/shaders/frag.glsl", "src/shaders/vert.glsl", 4, glm::vec3(0.0f, -10.0f, 0.0f));
+    s3gl::mesh land("assets/obj/terrain.obj", "assets/tex/grass.png", "src/shaders/frag.glsl", "src/shaders/vert.glsl", 4, glm::vec3(0.0f, -10.0f, 0.0f));
     land.link_atribute({0, 1, 2}, {3, 2, 3}, 8 * sizeof(float), {(void*)0, (void*)(3 * sizeof(float)), (void*)(6 * sizeof(float))});
     land.set_tex_flags(s3gl::MESH_TEX_PRESET_1);
 
@@ -91,6 +91,8 @@ void app::loop()
     int light_preset = s3gl::LIGHTING_DIRECT;
     cam.fov = 90.0f;
 
+    bool box_grounded = true;
+
     while(!glfwWindowShouldClose(window))
     {
         glClearColor(b[0], b[1], b[2], 1.0f);
@@ -99,11 +101,17 @@ void app::loop()
 
         light_col = glm::vec4(b2[0], b2[1], b2[2], 1.0f);
         light_pos = glm::vec3(a[0], a[1], a[2]);
-        cube2.pos = glm::vec3(a[0], a[1], a[2]);
+        cube2.pos.x += (cam.pos.x - 2.0f - cube2.pos.x) / 50.0f;
+        cube2.pos.z += (cam.pos.z - 2.0f - cube2.pos.z) / 50.0f;
+        if(box_grounded)
+            cube2.pos.y = land.get_height_data(cube2.pos) - 8.0f;
+        else
+            cube2.pos.y += (cam.pos.y - 2.0f - cube2.pos.y) / 50.0f;
+
         
         cam.speed = rot_speed;
         
-        if (!ImGui::GetIO().WantCaptureMouse)     
+        // if (!ImGui::GetIO().WantCaptureMouse)     
             cam.inputs(window, land.get_height_data(cam.pos) - 5.0f);
         cam.update_matrix(0.1f, 10000.0f);
 
@@ -127,11 +135,12 @@ void app::loop()
         ImGui::End();
         // tri toggle
         ImGui::Begin("Movement");
-        ImGui::SliderFloat("Speed", &rot_speed, 0.0f, 0.1f);
+        ImGui::SliderFloat("Speed", &rot_speed, 0.0f, 0.5f);
         ImGui::SliderFloat("Gravity", &cam.gravity, 1.0f, 5.0f);
         ImGui::SliderFloat("Sens", &cam.sens, 0.0f, 5.0f);
-        ImGui::SliderFloat3("Light Pos", a, -10.0f, 10.0f);
+        // ImGui::SliderFloat3("Light Pos", a, -10.0f, 10.0f);
         ImGui::Checkbox("Grounded", &cam.grounded);
+        ImGui::Checkbox("Box Grounded", &box_grounded);
         ImGui::End();
         // lighting
         ImGui::Begin("Lighting");
