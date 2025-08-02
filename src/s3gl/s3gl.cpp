@@ -51,24 +51,24 @@ std::vector<std::string> s3gl::split_string(const std::string& i, char separatin
         // checking if i[j] is the separating char or is at the end
         if(i[j] == separating_char || j == i.length() - 1)
         {
-            std::string to_go;
-            // resizing string due to to_go being freed every 
+            std::string word;
+            // resizing string due to word being freed every 
             // iteration
-            to_go.resize(index_f - index_b);
+            word.resize(index_f - index_b);
 
             // copying chars over to new string based on foward and
             // back indexes
             for(int t = 0; t < (index_f - index_b); t++)    
-                to_go[t] = i[t + index_b];
+                word[t] = i[t + index_b];
 
             // adding the last character on in the case it is the 
             // last word in the string
             if(j == i.size() - 1)
-                to_go.push_back(i[j]);
+                word.push_back(i[j]);
 
             // adding newly created string to the vector and updating
             // the back index
-            out.push_back(to_go);
+            out.push_back(word);
             index_b = j + 1;
         }
     }
@@ -77,12 +77,10 @@ std::vector<std::string> s3gl::split_string(const std::string& i, char separatin
 
 int s3gl::calc_fps() 
 { 
-
     // Frame info
-    float currentTime = glfwGetTime();
-    float deltaTime = currentTime - last_time;
-    last_time = currentTime;
-    return 1 / deltaTime; 
+    float delta_time = glfwGetTime() - last_time;
+    last_time = glfwGetTime();
+    return 1 / delta_time; 
 }
 
 void s3gl::terminate()

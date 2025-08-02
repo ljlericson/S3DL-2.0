@@ -20,7 +20,10 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <functional>
+#include <memory>
 #include <vector>
+#include <map>
 #include <array>
 #include <limits>
 #include <cmath>
@@ -61,6 +64,11 @@ namespace s3gl
         LIGHTING_DIRECT = 0x21,
         LIGHTING_POINT = 0x22,
     } engine;
+
+    enum class imgui_type
+    {
+        
+    };
 
 
     int init(int flags);

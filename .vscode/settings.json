@@ -51,6 +51,16 @@
         "typeinfo": "cpp",
         "typeindex": "cpp",
         "strstream": "cpp",
-        "map": "cpp"
+        "map": "cpp",
+        "any": "cpp",
+        "codecvt": "cpp",
+        "ctime": "cpp",
+        "forward_list": "cpp",
+        "ratio": "cpp",
+        "iomanip": "cpp",
+        "ranges": "cpp",
+        "span": "cpp",
+        "valarray": "cpp",
+        "variant": "cpp"
     }
 }
