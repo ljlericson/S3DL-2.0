@@ -6,7 +6,7 @@ namespace s3gl
     class asset_manager
     {
     private:
-        static inline std::unordered_map<std::size_t, std::shared_ptr<mesh>> sm_mesh;
+        static inline std::unordered_map<std::size_t, std::unique_ptr<mesh>> sm_mesh;
         static inline std::hash<std::string> sm_hasher;
         static inline s3gl::asset_manager sm_instance;
     public:
