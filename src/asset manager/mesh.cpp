@@ -5,21 +5,22 @@ s3gl::mesh::mesh()
     has_init = false;
 }
 
-s3gl::mesh::mesh(const std::string& objfpath, const std::string& texfpath, const std::string& fragfpath, const std::string& vertfpath, int tex_unit, glm::vec3 pos)
+s3gl::mesh::mesh(const std::string& objfpath, const std::string& texfpath, const s3gl::shader& shad, int tex_unit, glm::vec3 pos)
+    :   m_shad(shad)
 {
     has_init = false;
     
     std::ifstream obj_file(objfpath);
     if(obj_file)
     {
+        m_shad.build();
         // setting up mesh aata
         this->pos = pos;
         objTex = texture(texfpath.c_str(), GL_TEXTURE0 + tex_unit, GL_TEXTURE_2D);
-        shad = shader(vertfpath, fragfpath);
         // binding vertex array object
         vao.bind();
-        shad.attach();
-        objTex.bind(shad.id);
+        m_shad.attach();
+        objTex.bind(m_shad.id);
         // setting up containers for .obj vertices extraction
         std::vector<glm::vec3> verts;
         std::vector<glm::vec3> norms;
@@ -92,7 +93,9 @@ s3gl::mesh::mesh(const std::string& objfpath, const std::string& texfpath, const
     }
 }
 
-void s3gl::mesh::link_atribute(std::vector<GLuint> layout_pos, std::vector<GLuint> num_comps, GLsizeiptr stride, std::vector<void*> offsets)
+
+
+void s3gl::mesh::link_atribute(const std::vector<GLuint>& layout_pos, const std::vector<GLuint>& num_comps, GLsizeiptr stride, const std::vector<void*>& offsets)
 {
     if((layout_pos.size() == num_comps.size() && num_comps.size() == offsets.size()) &&
         has_init)
@@ -134,27 +137,7 @@ void s3gl::mesh::set_tex_flags(int preset)
     }
 }
 
-// float s3gl::mesh::get_height_data(glm::vec2 pos)
-// {
-//     float min_dist_squared = std::numeric_limits<float>::max();
-//     float y_close = 0.0f;
-
-//     for (const auto& vert : m_verts) 
-//     {
-//         float dx = vert.x - pos.x;
-//         float dz = vert.z - pos.y;
-//         float dist_squared = dx * dx + dz * dz;
-
-//         if (dist_squared < min_dist_squared) 
-//         {
-//             min_dist_squared = dist_squared;
-//             y_close = vert.y;
-//         }
-//     }
-//     return y_close;
-// }
-
-float s3gl::mesh::get_height_data(glm::vec3 pos)
+float s3gl::mesh::get_height_data(const glm::vec3& pos)
 {
     float min_dist_squared = std::numeric_limits<float>::max();
     float y_close = 0.0f;
@@ -182,34 +165,36 @@ void s3gl::mesh::draw(camera& cam, const glm::vec3& light_pos, const glm::vec4& 
         model = glm::mat4(1.0f);
         model = glm::translate(model, pos);
 
-        shad.activate();
-        GLuint loc = glGetUniformLocation(shad.id, "cam_pos");
+        m_shad.activate();
+        GLint current;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &current);
+        GLuint loc = glGetUniformLocation(m_shad.id, "cam_pos");
         if(loc == -1)
             std::cout << "Couldn't find cam_pos loc\n";
         glUniform3f(loc, cam.pos.x, cam.pos.y, cam.pos.z);
 
-        GLuint loc2 = glGetUniformLocation(shad.id, "light_col");
+        GLuint loc2 = glGetUniformLocation(m_shad.id, "light_col");
         if(loc2 == -1)
             std::cout << "Couldn't find light_col loc\n";
         glUniform4f(loc2, light_col.x, light_col.y, light_col.z, light_col.w);
 
-        GLuint loc3 = glGetUniformLocation(shad.id, "light_pos");
+        GLuint loc3 = glGetUniformLocation(m_shad.id, "light_pos");
         if(loc3 == -1)
             std::cout << "Couldn't find light_pos loc\n";
         glUniform3f(loc3, light_pos.x, light_pos.y, light_pos.z);
 
-        GLuint loc4 = glGetUniformLocation(shad.id, "model");
+        GLuint loc4 = glGetUniformLocation(m_shad.id, "model");
         if(loc4 == -1)
             std::cout << "Couldn't find model loc\n";
         glUniformMatrix4fv(loc4, 1, GL_FALSE, glm::value_ptr(model));
 
-        GLuint loc5 = glGetUniformLocation(shad.id, "light_preset");
+        GLuint loc5 = glGetUniformLocation(m_shad.id, "light_preset");
         if(loc4 == -1)
             std::cout << "Couldn't find model loc\n";
         glUniform1i(loc5, light_preset - 0x20);
 
 
-        cam.matrix(shad, "camMat");
+        cam.matrix(m_shad, "camMat");
         objTex.bind();
         vao.bind();
         glDrawArrays(GL_TRIANGLES, 0, num_verts);

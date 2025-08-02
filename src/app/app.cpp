@@ -60,15 +60,25 @@ void app::loop()
     // Hello GitHub!
     ImGuiIO& io = ImGui::GetIO();
 
-    std::size_t cube_hash = s3gl::asset_manager::new_mesh("cube", "assets/obj/torus.obj", "assets/tex/grass.png", "src/shaders/frag.glsl", "src/shaders/vert.glsl", 0, glm::vec3(3.0f, 3.0f, -3.0f));
+    std::size_t shad_hash = s3gl::asset_manager::new_shad("normal", "src/shaders/vert.glsl", "src/shaders/frag.glsl");
 
-    std::size_t cone_hash = s3gl::asset_manager::new_mesh("cone", "assets/obj/cone.obj", "assets/tex/2.jpg", "src/shaders/frag.glsl", "src/shaders/vert.glsl", 1, glm::vec3(-3.0f, -2.0f, 3.0f));
+    std::size_t cube_hash = s3gl::asset_manager::new_mesh("cube", "assets/obj/torus.obj", "assets/tex/grass.png", shad_hash, 0, glm::vec3(3.0f, 3.0f, -3.0f));
+    s3gl::mesh& cube = s3gl::asset_manager::get_mesh(cube_hash);
 
-    std::size_t cone2_hash = s3gl::asset_manager::new_mesh("cone2", "assets/obj/cone.obj", "assets/tex/2.jpg", "src/shaders/frag.glsl", "src/shaders/vert.glsl", 2, glm::vec3(-3.0f, -2.0f, -3.0f));
+    std::size_t cone_hash = s3gl::asset_manager::new_mesh("cone", "assets/obj/cone.obj", "assets/tex/2.jpg", shad_hash, 1, glm::vec3(-3.0f, -2.0f, 3.0f));
+    s3gl::mesh& cone = s3gl::asset_manager::get_mesh(cone_hash);
 
-    std::size_t cube2_hash = s3gl::asset_manager::new_mesh("cube2", "assets/obj/cube.obj", "assets/tex/2.jpg", "src/shaders/frag.glsl", "src/shaders/vert.glsl", 3, glm::vec3(-3.0f, -2.0f, -3.0f));
+    std::size_t cone2_hash = s3gl::asset_manager::new_mesh("cone2", "assets/obj/cone.obj", "assets/tex/2.jpg", shad_hash, 2, glm::vec3(-3.0f, -2.0f, -3.0f));
+    s3gl::mesh& cone2 = s3gl::asset_manager::get_mesh(cone2_hash);
 
-    std::size_t land_hash = s3gl::asset_manager::new_mesh("land", "assets/obj/terrain.obj", "assets/tex/grass.png", "src/shaders/frag.glsl", "src/shaders/vert.glsl", 4, glm::vec3(0.0f, -10.0f, 0.0f));
+    std::size_t cube2_hash = s3gl::asset_manager::new_mesh("cube2", "assets/obj/cube.obj", "assets/tex/2.jpg", shad_hash, 3, glm::vec3(-3.0f, -2.0f, -3.0f));
+    s3gl::mesh& cube2 = s3gl::asset_manager::get_mesh(cube2_hash);
+
+    std::size_t land_hash = s3gl::asset_manager::new_mesh("land", "assets/obj/terrain.obj", "assets/tex/grass.png", shad_hash, 4, glm::vec3(0.0f, -10.0f, 0.0f));
+    s3gl::mesh& land = s3gl::asset_manager::get_mesh(land_hash);
+
+    glm::vec4 light_col = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    glm::vec3 light_pos = glm::vec3(2.0f, 2.0f, 2.0f);
 
     float b[3] = {135.0f / 255.0f, 234.0f / 255.0f, 255.0f / 255.0f};
     float b2[3] = {1.0f, 1.0f, 1.0f};

@@ -63,11 +63,24 @@ vec4 no_light()
 
 void main()
 {
-    if(light_preset == 0)
-        FragColor = no_light();
-    if(light_preset == 1)
-        FragColor = direct_light();
-    if(light_preset == 2)
-        FragColor = point_light();
-    FragColor.w = 1.0f;
+    vec4 color;
+
+    switch (light_preset)
+    {
+        case 0:
+            color = no_light();
+            break;
+        case 1:
+            color = direct_light();
+            break;
+        case 2:
+            color = point_light();
+            break;
+        default:
+            color = texture(tex0, texCoord);
+            break;
+    }
+
+    color.a = 1.0;
+    FragColor = color;
 }

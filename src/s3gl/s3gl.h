@@ -21,6 +21,7 @@
 #include <fstream>
 #include <sstream>
 #include <functional>
+#include <string_view>
 #include <memory>
 #include <vector>
 #include <map>
