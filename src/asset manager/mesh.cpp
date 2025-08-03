@@ -5,8 +5,8 @@ s3gl::mesh::mesh()
     has_init = false;
 }
 
-s3gl::mesh::mesh(const std::string& objfpath, const std::string& texfpath, const s3gl::shader& shad, int tex_unit, glm::vec3 pos)
-    :   m_shad(shad)
+s3gl::mesh::mesh(const std::string& objfpath, const s3gl::shader& shad, s3gl::texture& tex, glm::vec3 pos)
+    :   m_shad(shad), objTex(tex)
 {
     has_init = false;
     
@@ -16,7 +16,6 @@ s3gl::mesh::mesh(const std::string& objfpath, const std::string& texfpath, const
         m_shad.build();
         // setting up mesh aata
         this->pos = pos;
-        objTex = texture(texfpath.c_str(), GL_TEXTURE0 + tex_unit, GL_TEXTURE_2D);
         // binding vertex array object
         vao.bind();
         m_shad.attach();

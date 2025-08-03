@@ -44,6 +44,8 @@
 #include <imgui_impl_opengl3.h>
 // stb
 #include <stb/stb_image.h>
+// doctests
+// #include <doctest/extensions/doctest_mpi.h>
 // scr macros
 #define WIDTH 1280
 #define HEIGHT 720

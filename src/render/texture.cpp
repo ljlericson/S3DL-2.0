@@ -58,3 +58,8 @@ void s3gl::texture::_delete()
 {
     glDeleteTextures(1, &id);
 }
+
+s3gl::texture::~texture()
+{
+    _delete();
+}

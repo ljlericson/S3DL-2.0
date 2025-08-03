@@ -16,7 +16,22 @@ std::size_t s3gl::asset_manager::new_shad(std::string_view name_shad, std::strin
     return hash;
 }
 
-std::size_t s3gl::asset_manager::new_mesh(std::string_view name_mesh, const std::string& objfpath, const std::string& texfpath, std::size_t shad_hash, int tex_unit, const glm::vec3& pos)
+std::size_t s3gl::asset_manager::new_tex(std::string_view name_tex, std::string_view fpath)
+{
+    if(sm_textures.size() == 9) 
+    {   std::cout << "[ERROR]: Texture slots are full (asset_mannager::new_tex())\n";   return -1;    }
+    else
+    {
+        std::string s_hash = "tex_";
+        s_hash += name_tex;
+        GLuint tex_slot = GL_TEXTURE0 + sm_textures.size();
+        std::size_t hash = sm_hasher(s_hash);
+        sm_textures[hash] = std::make_unique<texture>(fpath.data(), tex_slot, GL_TEXTURE_2D);
+        return hash;
+    }
+}
+
+std::size_t s3gl::asset_manager::new_mesh(std::string_view name_mesh, const std::string& objfpath, std::size_t shad_hash, std::size_t tex_hash, const glm::vec3& pos)
 {
     // first check that the shader is valid
     if(sm_shaders.find(shad_hash) != sm_shaders.end())
@@ -25,14 +40,13 @@ std::size_t s3gl::asset_manager::new_mesh(std::string_view name_mesh, const std:
         std::string s_hash = "mesh_";
         s_hash += name_mesh;
         std::size_t hash = sm_hasher(s_hash);
-        sm_meshes[hash] = std::make_unique<s3gl::mesh>(objfpath, texfpath, *sm_shaders.at(shad_hash), tex_unit, pos);
+        sm_meshes[hash] = std::make_unique<s3gl::mesh>(objfpath, *sm_shaders.at(shad_hash), *sm_textures.at(tex_hash), pos);
         sm_meshes.at(hash)->link_atribute({0, 1, 2}, {3, 2, 3}, 8 * sizeof(float), {(void*)0, (void*)(3 * sizeof(float)), (void*)(6 * sizeof(float))});
         sm_meshes.at(hash)->set_tex_flags(s3gl::MESH_TEX_PRESET_1);
         return hash;
     }
     else
     {   throw s3gl::exception("[ERROR]: Shader hash entered is invalid (new_mesh)\n");  }
-
 }
 
 
@@ -56,6 +70,11 @@ std::size_t s3gl::asset_manager::get_shad_hash(std::string_view name)
     std::string s_hash = "shad_";
     s_hash += name;
     return sm_hasher(s_hash);
+}
+
+const std::unordered_map<std::size_t, std::unique_ptr<s3gl::mesh>>& s3gl::asset_manager::get_mesh_map()
+{
+    return sm_meshes;
 }
 
 void s3gl::asset_manager::rm_mesh(std::size_t hash)

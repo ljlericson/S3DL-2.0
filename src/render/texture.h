@@ -20,6 +20,8 @@ namespace s3gl
     public:
         texture();
 
+        ~texture();
+
         texture(const char* fpath, GLuint tex_unit, GLuint target);
 
         void set_param(GLuint pname, GLuint params);

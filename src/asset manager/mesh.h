@@ -21,7 +21,7 @@ namespace s3gl
     public:
         glm::vec3 pos;
         mesh();
-        mesh(const std::string& objfpath, const std::string& texfpath, const s3gl::shader& shad, int tex_unit, glm::vec3 pos);
+        mesh(const std::string& objfpath, const s3gl::shader& shad, s3gl::texture& tex, glm::vec3 pos);
 
         void link_atribute(const std::vector<GLuint>& layout_pos, const std::vector<GLuint>& num_comps, GLsizeiptr stride, const std::vector<void*>& offsets);
 

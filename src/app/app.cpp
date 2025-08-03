@@ -59,23 +59,19 @@ void app::loop()
 {   
     // Hello GitHub!
     ImGuiIO& io = ImGui::GetIO();
-
+    // shaders
     std::size_t shad_hash = s3gl::asset_manager::new_shad("normal", "src/shaders/vert.glsl", "src/shaders/frag.glsl");
-
-    std::size_t cube_hash = s3gl::asset_manager::new_mesh("cube", "assets/obj/torus.obj", "assets/tex/grass.png", shad_hash, 0, glm::vec3(3.0f, 3.0f, -3.0f));
-    s3gl::mesh& cube = s3gl::asset_manager::get_mesh(cube_hash);
-
-    std::size_t cone_hash = s3gl::asset_manager::new_mesh("cone", "assets/obj/cone.obj", "assets/tex/2.jpg", shad_hash, 1, glm::vec3(-3.0f, -2.0f, 3.0f));
-    s3gl::mesh& cone = s3gl::asset_manager::get_mesh(cone_hash);
-
-    std::size_t cone2_hash = s3gl::asset_manager::new_mesh("cone2", "assets/obj/cone.obj", "assets/tex/2.jpg", shad_hash, 2, glm::vec3(-3.0f, -2.0f, -3.0f));
-    s3gl::mesh& cone2 = s3gl::asset_manager::get_mesh(cone2_hash);
-
-    std::size_t cube2_hash = s3gl::asset_manager::new_mesh("cube2", "assets/obj/cube.obj", "assets/tex/2.jpg", shad_hash, 3, glm::vec3(-3.0f, -2.0f, -3.0f));
+    std::size_t tex_hash0 = s3gl::asset_manager::new_tex("normal", "assets/tex/2.jpg");
+    std::size_t tex_hash1 = s3gl::asset_manager::new_tex("normal", "assets/tex/grass.png");
+    // meshes
+    std::size_t cube_hash  = s3gl::asset_manager::new_mesh("cube", "assets/obj/torus.obj", shad_hash, tex_hash0, glm::vec3(3.0f, 3.0f, -3.0f));
+    std::size_t cone_hash  = s3gl::asset_manager::new_mesh("cone", "assets/obj/cone.obj", shad_hash, tex_hash1, glm::vec3(-3.0f, -2.0f, 3.0f));
+    std::size_t cone2_hash = s3gl::asset_manager::new_mesh("cone2", "assets/obj/cone.obj", shad_hash, tex_hash1, glm::vec3(-3.0f, -2.0f, -3.0f));
+    std::size_t cube2_hash = s3gl::asset_manager::new_mesh("cube2", "assets/obj/cube.obj", shad_hash, tex_hash1, glm::vec3(-3.0f, -2.0f, -3.0f));
+    std::size_t land_hash  = s3gl::asset_manager::new_mesh("land", "assets/obj/terrain.obj", shad_hash, tex_hash1, glm::vec3(0.0f, -10.0f, 0.0f));
+    // objects that actually do stuff
     s3gl::mesh& cube2 = s3gl::asset_manager::get_mesh(cube2_hash);
-
-    std::size_t land_hash = s3gl::asset_manager::new_mesh("land", "assets/obj/terrain.obj", "assets/tex/grass.png", shad_hash, 4, glm::vec3(0.0f, -10.0f, 0.0f));
-    s3gl::mesh& land = s3gl::asset_manager::get_mesh(land_hash);
+    s3gl::mesh& land  = s3gl::asset_manager::get_mesh(land_hash);
 
     glm::vec4 light_col = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
     glm::vec3 light_pos = glm::vec3(2.0f, 2.0f, 2.0f);
@@ -112,12 +108,9 @@ void app::loop()
         // if (!ImGui::GetIO().WantCaptureMouse)     
             cam.inputs(window, land.get_height_data(cam.pos) - 5.0f);
         cam.update_matrix(0.1f, 10000.0f);
-
-        cube.draw(cam, glm::vec3(light_pos), glm::vec4(light_col), light_preset);
-        cone.draw(cam, glm::vec3(light_pos), glm::vec4(light_col), light_preset);
-        cone2.draw(cam, glm::vec3(light_pos), glm::vec4(light_col), light_preset);
-        cube2.draw(cam, glm::vec3(light_pos), glm::vec4(light_col), light_preset);
-        land.draw(cam, glm::vec3(light_pos), glm::vec4(light_col), light_preset);
+        
+        // all s3gl rendering
+        s3gl::renderer::render(cam, glm::vec3(light_pos), glm::vec4(light_col), light_preset);
 
         // ALL imgui rendering
         ImGui_ImplOpenGL3_NewFrame();
