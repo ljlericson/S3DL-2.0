@@ -24,7 +24,7 @@ namespace s3gl
         // keeping functions static for use of class
         // as namespace with private attributes to
         // avoid weird stuff
-        static std::size_t new_tex(std::string_view name_tex, std::string_view fpath);
+        static std::size_t new_tex(std::string_view name_tex, std::string_view fpath, std::size_t shad_hash);
         static std::size_t new_shad(std::string_view name_shad, std::string_view fpathVert, std::string_view fpathFrag);
         static std::size_t new_mesh(std::string_view name_mesh, const std::string& objfpath, std::size_t shad_hash, std::size_t tex_hash, const glm::vec3& pos);
         // rm == remove

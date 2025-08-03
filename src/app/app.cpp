@@ -61,8 +61,8 @@ void app::loop()
     ImGuiIO& io = ImGui::GetIO();
     // shaders
     std::size_t shad_hash = s3gl::asset_manager::new_shad("normal", "src/shaders/vert.glsl", "src/shaders/frag.glsl");
-    std::size_t tex_hash0 = s3gl::asset_manager::new_tex("normal", "assets/tex/2.jpg");
-    std::size_t tex_hash1 = s3gl::asset_manager::new_tex("normal", "assets/tex/grass.png");
+    std::size_t tex_hash0 = s3gl::asset_manager::new_tex("normal", "assets/tex/2.jpg", shad_hash);
+    std::size_t tex_hash1 = s3gl::asset_manager::new_tex("normal1", "assets/tex/grass.png", shad_hash);
     // meshes
     std::size_t cube_hash  = s3gl::asset_manager::new_mesh("cube", "assets/obj/torus.obj", shad_hash, tex_hash0, glm::vec3(3.0f, 3.0f, -3.0f));
     std::size_t cone_hash  = s3gl::asset_manager::new_mesh("cone", "assets/obj/cone.obj", shad_hash, tex_hash1, glm::vec3(-3.0f, -2.0f, 3.0f));

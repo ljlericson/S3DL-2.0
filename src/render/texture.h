@@ -12,11 +12,11 @@ namespace s3gl
         GLuint tex_unit;
         // texture info
         int t_width, 
-            t_height, 
-            num_col_chan;
+        t_height, 
+        num_col_chan;
         // texture bytes
         uint8_t* bytes;
-
+        
     public:
         texture();
 

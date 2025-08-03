@@ -16,7 +16,7 @@ std::size_t s3gl::asset_manager::new_shad(std::string_view name_shad, std::strin
     return hash;
 }
 
-std::size_t s3gl::asset_manager::new_tex(std::string_view name_tex, std::string_view fpath)
+std::size_t s3gl::asset_manager::new_tex(std::string_view name_tex, std::string_view fpath, std::size_t shad_hash)
 {
     if(sm_textures.size() == 9) 
     {   std::cout << "[ERROR]: Texture slots are full (asset_mannager::new_tex())\n";   return -1;    }
@@ -27,6 +27,7 @@ std::size_t s3gl::asset_manager::new_tex(std::string_view name_tex, std::string_
         GLuint tex_slot = GL_TEXTURE0 + sm_textures.size();
         std::size_t hash = sm_hasher(s_hash);
         sm_textures[hash] = std::make_unique<texture>(fpath.data(), tex_slot, GL_TEXTURE_2D);
+        sm_textures[hash]->bind(sm_shaders[shad_hash]->id);
         return hash;
     }
 }
@@ -34,7 +35,7 @@ std::size_t s3gl::asset_manager::new_tex(std::string_view name_tex, std::string_
 std::size_t s3gl::asset_manager::new_mesh(std::string_view name_mesh, const std::string& objfpath, std::size_t shad_hash, std::size_t tex_hash, const glm::vec3& pos)
 {
     // first check that the shader is valid
-    if(sm_shaders.find(shad_hash) != sm_shaders.end())
+    if(sm_shaders.find(shad_hash) != sm_shaders.end() && sm_textures.find(tex_hash) != sm_textures.end())
     {
         // create hash for accsesing obj later
         std::string s_hash = "mesh_";
@@ -46,7 +47,7 @@ std::size_t s3gl::asset_manager::new_mesh(std::string_view name_mesh, const std:
         return hash;
     }
     else
-    {   throw s3gl::exception("[ERROR]: Shader hash entered is invalid (new_mesh)\n");  }
+    {   throw s3gl::exception("[ERROR]: Shader or texture hash entered is invalid (new_mesh)\n");  }
 }
 
 

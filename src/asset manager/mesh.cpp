@@ -19,7 +19,6 @@ s3gl::mesh::mesh(const std::string& objfpath, const s3gl::shader& shad, s3gl::te
         // binding vertex array object
         vao.bind();
         m_shad.attach();
-        objTex.bind(m_shad.id);
         // setting up containers for .obj vertices extraction
         std::vector<glm::vec3> verts;
         std::vector<glm::vec3> norms;
