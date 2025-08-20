@@ -10,18 +10,48 @@ s3gl::scene::scene(std::string_view fpath_json)
     nlohmann::json j;
     file >> j;
 
-    // Parse objects
+    // Parse and load shaders
+    for (auto& [name, arr] : j["shaders"].items())
+    {
+        // entering as c_str() because
+        // conversion between c_str and
+        // strview is faster than str
+        // to strview
+        asset_manager::new_shad(name.c_str(), 
+                                arr[0].get<std::string>().c_str(), 
+                                arr[1].get<std::string>().c_str());
+    }
+
+    // Parse and load textures
+    for (auto& [name, arr] : j["textures"].items())
+    {
+        // keeping order for a reason:
+        // textures need shaders for
+        // loading, objects neeed 
+        // both shaders and textures
+        // for loading
+        asset_manager::new_tex(name.c_str(),
+                               arr[1].get<std::string_view>(),
+                               asset_manager::get_shad_hash(arr[0].get<std::string_view>()));
+    }
+
+    // Parse and load objects
     for (auto& [name, arr] : j["objects"].items())
     {
         std::string path = arr[0].get<std::string>();
-        auto coords = arr[1];
+        auto coords = arr[3];
         glm::vec3 pos(coords[0].get<float>(), coords[1].get<float>(), coords[2].get<float>());
 
-        std::cout << "Object '" << name << "' from " << path
-                  << " at (" << pos.x << ", " << pos.y << ", " << pos.z << ")\n";
+        asset_manager::new_mesh(name.c_str(), 
+                                arr[0].get<std::string>(),
+                                asset_manager::get_shad_hash(arr[2].get<std::string_view>()),
+                                asset_manager::get_tex_hash(arr[1].get<std::string_view>()),
+                                pos);
+
+        m_mesh_hash_map[name] = asset_manager::get_mesh_hash(name);
     }
 
-    // Parse sounds
+    // Parse and load sounds sounds
     for (auto& [name, arr] : j["events"]["sound"].items())
     {
         std::string path = arr[0].get<std::string>();
@@ -38,4 +68,9 @@ s3gl::scene::scene(std::string_view fpath_json)
         actor_manager::new_sound_actor(asset_manager::new_WAV_buffer(name, path), hash, pos);
     }
 
+}
+
+s3gl::mesh& s3gl::scene::get_mesh_ref(std::string_view name)
+{
+    return asset_manager::get_mesh(m_mesh_hash_map[name.data()]);
 }

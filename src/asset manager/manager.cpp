@@ -107,6 +107,9 @@ std::size_t s3gl::asset_manager::get_mesh_hash(std::string_view name)
     if(sm_meshes.find(hash) != sm_meshes.end())
         return hash;
     else
+        // don't throw exception because missing mesh
+        // is A LOT easier to debug than the others
+        // and a throw would be unnecesary
         return 0;
 }
 
@@ -114,7 +117,22 @@ std::size_t s3gl::asset_manager::get_shad_hash(std::string_view name)
 {
     std::string s_hash = "shad_";
     s_hash += name;
-    return sm_hasher(s_hash);
+    std::size_t hash = sm_hasher(s_hash);
+    if(sm_shaders.find(hash) != sm_shaders.end())
+        return hash;
+    else
+        throw s3gl::exception("[ERROR]: Hashed object does not exist (get_shad_hash)\n");
+}
+
+std::size_t s3gl::asset_manager::get_tex_hash(std::string_view name)
+{
+    std::string s_hash = "tex_";
+    s_hash += name;
+    std::size_t hash = sm_hasher(s_hash);
+    if(sm_textures.find(hash) != sm_textures.end())
+        return hash;
+    else
+        throw s3gl::exception("[ERROR]: Hashed object does not exist (get_tex_hash)\n");
 }
 
 const std::unordered_map<std::size_t, std::unique_ptr<s3gl::mesh>>& s3gl::asset_manager::get_mesh_map()

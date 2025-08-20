@@ -66,20 +66,20 @@ void app::loop()
     s3gl::asset_manager::tex_hash tex_hash_flower = s3gl::asset_manager::new_tex("normal", "assets/tex/2.jpg", shad_hash);
     s3gl::asset_manager::tex_hash tex_hash_grass = s3gl::asset_manager::new_tex("normal1", "assets/tex/grass.png", shad_hash);
     // meshes
-    std::size_t cube_hash  = s3gl::asset_manager::new_mesh("cube", "assets/obj/torus.obj", shad_hash, tex_hash_flower, glm::vec3(3.0f, 3.0f, -3.0f));
-    std::size_t cone_hash  = s3gl::asset_manager::new_mesh("cone", "assets/obj/cone.obj", shad_hash, tex_hash_flower, glm::vec3(-3.0f, -2.0f, 3.0f));
-    std::size_t cone2_hash = s3gl::asset_manager::new_mesh("cone2", "assets/obj/cone.obj", shad_hash, tex_hash_flower, glm::vec3(-3.0f, -2.0f, -3.0f));
-    std::size_t cube2_hash = s3gl::asset_manager::new_mesh("cube2", "assets/obj/cube.obj", shad_hash, tex_hash_flower, glm::vec3(-3.0f, -2.0f, -3.0f));
-    std::size_t cube3_hash = s3gl::asset_manager::new_mesh("cube3", "assets/obj/cube.obj", shad_hash, tex_hash_flower, glm::vec3(0.0f, 2.0f, 0.0f));
-    std::size_t land_hash  = s3gl::asset_manager::new_mesh("land", "assets/obj/terrain.obj", shad_hash, tex_hash_grass, glm::vec3(0.0f, -10.0f, 0.0f));
+    // std::size_t cube_hash  = s3gl::asset_manager::new_mesh("cube", "assets/obj/torus.obj", shad_hash, tex_hash_flower, glm::vec3(3.0f, 3.0f, -3.0f));
+    // std::size_t cone_hash  = s3gl::asset_manager::new_mesh("cone", "assets/obj/cone.obj", shad_hash, tex_hash_flower, glm::vec3(-3.0f, -2.0f, 3.0f));
+    // std::size_t cone2_hash = s3gl::asset_manager::new_mesh("cone2", "assets/obj/cone.obj", shad_hash, tex_hash_flower, glm::vec3(-3.0f, -2.0f, -3.0f));
+    // std::size_t cube2_hash = s3gl::asset_manager::new_mesh("cube2", "assets/obj/cube.obj", shad_hash, tex_hash_flower, glm::vec3(-3.0f, -2.0f, -3.0f));
+    // std::size_t cube3_hash = s3gl::asset_manager::new_mesh("cube3", "assets/obj/cube.obj", shad_hash, tex_hash_flower, glm::vec3(0.0f, 2.0f, 0.0f));
+    // std::size_t land_hash  = s3gl::asset_manager::new_mesh("land", "assets/obj/terrain.obj", shad_hash, tex_hash_grass, glm::vec3(0.0f, -10.0f, 0.0f));
     
     // new class (still heavy WIP)
     s3gl::scene scene1("assets/scenes/scene.json");
     
     // objects that actually do stuff
-    s3gl::mesh& cube2 = s3gl::asset_manager::get_mesh(cube2_hash);
-    s3gl::mesh& land  = s3gl::asset_manager::get_mesh(land_hash);
-    s3gl::mesh& cube3  = s3gl::asset_manager::get_mesh(cube3_hash);
+    s3gl::mesh& cube2 = scene1.get_mesh_ref("cube2");
+    s3gl::mesh& land  = scene1.get_mesh_ref("land");
+    s3gl::mesh& cube3  = scene1.get_mesh_ref("cube3");
     
     
     glm::vec4 light_col = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);

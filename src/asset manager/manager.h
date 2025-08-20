@@ -41,6 +41,7 @@ namespace s3gl
         static const ALuint get_WAV_buffer(std::size_t hash);
         static std::size_t get_mesh_hash(std::string_view name);
         static std::size_t get_shad_hash(std::string_view name);
+        static std::size_t get_tex_hash(std::string_view name);
         static const std::unordered_map<std::size_t, std::unique_ptr<mesh>>& get_mesh_map();
         static void rm_mesh(std::size_t hash);
         static void clear();
