@@ -136,3 +136,11 @@ void s3gl::camera::inputs(GLFWwindow* window, float height_data)
 		first_click = true;
 	}
 }
+
+std::array<float, 6> s3gl::camera::get_orientation()
+{
+    return {
+        orientation.x, orientation.y, orientation.z,
+        up.x, up.y, up.z
+    };
+}

@@ -163,9 +163,9 @@ void s3gl::mesh::draw(camera& cam, const glm::vec3& light_pos, const glm::vec4& 
         model = glm::mat4(1.0f);
         model = glm::translate(model, pos);
 
+        glm::vec3 light_pos_orient = light_pos;
+
         m_shad.activate();
-        GLint current;
-        glGetIntegerv(GL_CURRENT_PROGRAM, &current);
         GLuint loc = glGetUniformLocation(m_shad.id, "cam_pos");
         if(loc == -1)
             std::cout << "Couldn't find cam_pos loc\n";
@@ -179,7 +179,7 @@ void s3gl::mesh::draw(camera& cam, const glm::vec3& light_pos, const glm::vec4& 
         GLuint loc3 = glGetUniformLocation(m_shad.id, "light_pos");
         if(loc3 == -1)
             std::cout << "Couldn't find light_pos loc\n";
-        glUniform3f(loc3, light_pos.x, light_pos.y, light_pos.z);
+        glUniform3f(loc3, light_pos_orient.x, light_pos_orient.y, light_pos_orient.z);
 
         GLuint loc4 = glGetUniformLocation(m_shad.id, "model");
         if(loc4 == -1)

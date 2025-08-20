@@ -33,6 +33,8 @@ namespace s3gl
 
         void matrix(const shader& shader, const char* uniform);
 
+        std::array<float, 6> get_orientation();
+
         void inputs(GLFWwindow* window, float height_data);
     };
 }

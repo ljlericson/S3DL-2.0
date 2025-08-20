@@ -1,0 +1,12 @@
+{
+    "objects": {
+        "torus":["./assets/obj/torus.obj", [3.0, 3.0, -3.0]],
+        "cone":["./assets/obj/cone.obj",[-3.0, -2.0, 3.0]]
+    },
+    "events": {
+        "sound": {
+            "music":["./assets/audio/drums.wav", [10, 50, 0], "cube"],
+            "music2":["./assets/audio/music.wav", [0, 50, 0], null]
+        }
+    }
+}

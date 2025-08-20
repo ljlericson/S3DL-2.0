@@ -1,4 +1,4 @@
-#include "../render/renderer/renderer.h"
+#include "../scene/scene.h"
 #include "../render/imgui_element.h"
 
 class app

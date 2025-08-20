@@ -37,43 +37,26 @@ int s3gl::init(int flags)
     return 0;
 }
 
-std::vector<std::string> s3gl::split_string(const std::string& i, char separating_char)
+std::vector<std::string_view> s3gl::split_string(std::string_view input, char sep) 
 {
-    std::vector<std::string> out;
-    // index_f and index_b to keep track of individual word pos
-    int index_f, index_b = 0;
+    std::vector<std::string_view> result;
 
-    // iterates through the characters in string 'i'
-    for(int  j = 0; j < i.length(); j++)
+    size_t start = 0;
+    while (start < input.size()) 
     {
-        // updating front index
-        index_f = j;
-        // checking if i[j] is the separating char or is at the end
-        if(i[j] == separating_char || j == i.length() - 1)
+        size_t end = input.find(sep, start);
+        if (end == std::string_view::npos) 
         {
-            std::string word;
-            // resizing string due to word being freed every 
-            // iteration
-            word.resize(index_f - index_b);
-
-            // copying chars over to new string based on foward and
-            // back indexes
-            for(int t = 0; t < (index_f - index_b); t++)    
-                word[t] = i[t + index_b];
-
-            // adding the last character on in the case it is the 
-            // last word in the string
-            if(j == i.size() - 1)
-                word.push_back(i[j]);
-
-            // adding newly created string to the vector and updating
-            // the back index
-            out.push_back(word);
-            index_b = j + 1;
+            result.emplace_back(input.substr(start));
+            break;
         }
+        result.emplace_back(input.substr(start, end - start));
+        start = end + 1;
     }
-    return out;
+
+    return result;
 }
+
 
 int s3gl::calc_fps() 
 { 

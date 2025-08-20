@@ -11,6 +11,4 @@ int main(int argc, char* argv[])
     {
         std::cout << e.what() << '\n';
     }
-    
-    return 0;
 }

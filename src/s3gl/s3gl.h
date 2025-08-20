@@ -38,12 +38,20 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/vector_angle.hpp>
+// OpenAl
+#include <AL/al.h>
+#include <AL/alc.h>
 // the holy grail?
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 // stb
 #include <stb/stb_image.h>
+// dr_libs
+#include "../dr_libs/dr_wav.h"
+#include "../dr_libs/dr_mp3.h"
+// json parsing
+#include <nlohmann/json.hpp>
 // doctests
 // #include <doctest/extensions/doctest_mpi.h>
 // scr macros
@@ -58,14 +66,16 @@ namespace s3gl
 
     typedef enum
     {
-        INIT_GLFW = 0x00,
-        INIT_GLEW = 0x01,
+        INIT_GLFW = 0x31,
+        INIT_GLEW = 0x32,
 
         MESH_TEX_PRESET_1 = 0x11,
 
         LIGHTING_NOLIGHT = 0x20,
         LIGHTING_DIRECT = 0x21,
         LIGHTING_POINT = 0x22,
+        LIGHTING_SPOT = 0x23,
+        LIGHTING_SUN = 0x24,
     } engine;
 
     enum class imgui_type
@@ -77,11 +87,11 @@ namespace s3gl
     int init(int flags);
     
     // Parses individual words in a string that are separated by a chosen character
-    // \param std::string i string input
-    // \param char separating_char character used to separate string put ' ' if unsure
-    // \return std::vector<std::string> string vector where elemets are individual
+    // @param std::string i string input
+    // @param char separating_char character used to separate string put ' ' if unsure
+    // @return std::vector<std::string_view> string vector where elemets are individual
     // words that are sorted in order first appeared
-    std::vector<std::string> split_string(const std::string& i, char separating_char);
+    std::vector<std::string_view> split_string(std::string_view i, char separating_char);
 
     int calc_fps();
 
@@ -94,6 +104,13 @@ namespace s3gl
         glm::vec3 norm;
     };
 
+    struct basic_mesh
+    {
+        glm::vec3 pos;
+        std::string name;
+        std::string path;
+    };
+
     class exception
     {
     private:
@@ -102,5 +119,5 @@ namespace s3gl
         exception(const std::string& except);
         std::string what();
     }; 
-};
+}
 

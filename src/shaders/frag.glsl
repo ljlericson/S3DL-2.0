@@ -21,9 +21,8 @@ vec4 point_light()
     float intern = 1.0f / (a * dist * dist + b * dist + 1.0f);
 
     float ambient = 0.10f;
-
-
     vec3 normaln = normalize(normal);
+    normaln = faceforward(normaln, -vlight, normaln);
     vec3 light_dir = normalize(light_pos - crnt_pos);
     float diffuse = max(dot(normaln, light_dir), 0.0f);
 
@@ -44,6 +43,11 @@ vec4 direct_light()
     float ambient = 0.10f;
 
     vec3 normaln = normalize(normal);
+    vec3 toLight = light_pos - crnt_pos;
+    float dist = length(toLight);
+    vec3 lightDir = normalize(toLight);
+
+    normaln = faceforward(normaln, -lightDir, normaln);
     vec3 light_dir = normalize(vec3(1.0f, 1.0f, 0.0f));
     float diffuse = max(dot(normaln, light_dir), 0.0f);
 
