@@ -2,6 +2,14 @@
 
 s3gl::asset_manager s3gl::asset_manager::sm_instance;
 
+s3gl::asset_manager::audio_buffer::audio_buffer(ALuint id)
+    : id(id)  {  }
+
+s3gl::asset_manager::audio_buffer::~audio_buffer()
+{
+    alDeleteBuffers(1, &id);
+}
+
 s3gl::asset_manager& s3gl::asset_manager::get()
 {
     return sm_instance;
@@ -9,9 +17,8 @@ s3gl::asset_manager& s3gl::asset_manager::get()
 
 std::size_t s3gl::asset_manager::new_shad(std::string_view name_shad, std::string_view fpathVert, std::string_view fpathFrag)
 {
-    std::string s_hash = "shad_";
-    s_hash += name_shad;
-    std::size_t hash = sm_hasher(s_hash);
+    std::size_t hash = s3gl::fnv1a_hash((void*)name_shad.data(), name_shad.size());
+    sm_shader_key_map[name_shad.data()] = hash;
     if (sm_shaders.contains(hash)) 
         throw s3gl::exception("Duplicate name in asset manager new shader\n");
     sm_shaders[hash] = std::make_unique<s3gl::shader>(fpathVert, fpathFrag);
@@ -24,10 +31,10 @@ std::size_t s3gl::asset_manager::new_tex(std::string_view name_tex, std::string_
     {   std::cout << "[ERROR]: Texture slots are full (asset_mannager::new_tex())\n";   return -1;    }
     else
     {
-        std::string s_hash = "tex_";
-        s_hash += name_tex;
+        std::size_t hash = s3gl::fnv1a_hash((void*)name_tex.data(), name_tex.size());
+        sm_texture_key_map[name_tex.data()] = hash;
+        
         GLuint tex_slot = GL_TEXTURE0 + sm_textures.size();
-        std::size_t hash = sm_hasher(s_hash);
         if (sm_textures.contains(hash)) 
             throw s3gl::exception("Duplicate name in asset manager new texture\n");
         sm_textures[hash] = std::make_unique<texture>(fpath.data(), tex_slot, GL_TEXTURE_2D);
@@ -41,10 +48,9 @@ std::size_t s3gl::asset_manager::new_mesh(std::string_view name_mesh, const std:
     // first check that the shader is valid
     if(sm_shaders.find(shad_hash) != sm_shaders.end() && sm_textures.find(tex_hash) != sm_textures.end())
     {
-        // create hash for accsesing obj later
-        std::string s_hash = "mesh_";
-        s_hash += name_mesh;
-        std::size_t hash = sm_hasher(s_hash);
+        std::size_t hash = s3gl::fnv1a_hash((void*)name_mesh.data(), name_mesh.size());
+        sm_mesh_key_map[name_mesh.data()] = hash;
+
         if (sm_meshes.contains(hash)) 
             throw s3gl::exception("Duplicate name in asset manager new mesh\n");
         sm_meshes[hash] = std::make_unique<s3gl::mesh>(objfpath, *sm_shaders.at(shad_hash), *sm_textures.at(tex_hash), pos);
@@ -72,12 +78,12 @@ std::size_t s3gl::asset_manager::new_WAV_buffer(std::string_view name_audio, std
                 sample_rate);
     
     // create hash for accsesing obj later
-    std::string s_hash = "audio_";
-    s_hash += name_audio;
-    std::size_t hash = sm_hasher(s_hash);
+    std::size_t hash = s3gl::fnv1a_hash((void*)name_audio.data(), name_audio.size());
+        sm_audio_key_map[name_audio.data()] = hash;
+
     if (sm_audio_buffers.contains(hash)) 
         throw s3gl::exception("Duplicate name in asset manager new audio\n");
-    sm_audio_buffers[hash] = new_buffer;
+    sm_audio_buffers[hash] = std::make_unique<audio_buffer>(new_buffer);
         
     drwav_free(pcm_data, nullptr);
     return hash;
@@ -94,45 +100,33 @@ s3gl::mesh& s3gl::asset_manager::get_mesh(std::size_t hash)
 const ALuint s3gl::asset_manager::get_WAV_buffer(std::size_t hash)
 {
     if(sm_audio_buffers.find(hash) != sm_audio_buffers.end())
-        return sm_audio_buffers.at(hash);
+        return sm_audio_buffers.at(hash)->id;
     else
         throw s3gl::exception("[ERROR]: Hashed object does not exist (get_WAV_buffer)\n");
 }
 
 std::size_t s3gl::asset_manager::get_mesh_hash(std::string_view name)
 {
-    std::string s_hash = "mesh_";
-    s_hash += name;
-    std::size_t hash = sm_hasher(s_hash);
-    if(sm_meshes.find(hash) != sm_meshes.end())
-        return hash;
-    else
-        // don't throw exception because missing mesh
-        // is A LOT easier to debug than the others
-        // and a throw would be unnecesary
-        return 0;
+    if(sm_mesh_key_map.contains(std::string(name))) { return sm_mesh_key_map.at(std::string((name))); }
+    else { std::cout << "[WARNING]: No mesh hash found for given name (get_mesh_hash)\n"; return 0;}
 }
 
 std::size_t s3gl::asset_manager::get_shad_hash(std::string_view name)
 {
-    std::string s_hash = "shad_";
-    s_hash += name;
-    std::size_t hash = sm_hasher(s_hash);
-    if(sm_shaders.find(hash) != sm_shaders.end())
-        return hash;
-    else
-        throw s3gl::exception("[ERROR]: Hashed object does not exist (get_shad_hash)\n");
+    if(sm_shader_key_map.contains(std::string(name))) { return sm_shader_key_map.at(std::string(name)); }
+    else { std::cout << "[WARNING]: No shader hash found for given name (get_shader_hash)\n"; return 0;}
 }
 
 std::size_t s3gl::asset_manager::get_tex_hash(std::string_view name)
 {
-    std::string s_hash = "tex_";
-    s_hash += name;
-    std::size_t hash = sm_hasher(s_hash);
-    if(sm_textures.find(hash) != sm_textures.end())
-        return hash;
-    else
-        throw s3gl::exception("[ERROR]: Hashed object does not exist (get_tex_hash)\n");
+    if(sm_texture_key_map.contains(std::string(name))) { return sm_texture_key_map.at(std::string(name)); }
+    else { std::cout << "[WARNING]: No shader hash found for given name (get_texture_hash)\n"; return 0;}
+}
+
+std::size_t s3gl::asset_manager::get_WAV_hash (std::string_view name)
+{
+    if(sm_audio_key_map.contains(std::string(name))) { return sm_audio_key_map.at(std::string(name)); }
+    else { std::cout << "[WARNING]: No shader hash found for given name (get_audio_hash)\n"; return 0;}
 }
 
 const std::unordered_map<std::size_t, std::unique_ptr<s3gl::mesh>>& s3gl::asset_manager::get_mesh_map()
@@ -152,7 +146,14 @@ void s3gl::asset_manager::rm_mesh(std::size_t hash)
 void s3gl::asset_manager::clear()
 {
     sm_meshes.clear();
+    sm_mesh_key_map.clear();
+
     sm_shaders.clear();
+    sm_shader_key_map.clear();
+
     sm_textures.clear();
+    sm_texture_key_map.clear();
+
     sm_audio_buffers.clear();
+    sm_audio_key_map.clear();
 }

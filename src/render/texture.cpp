@@ -38,7 +38,7 @@ void s3gl::texture::bind(GLuint shad_program)
     glBindTexture(target, id);
 
     GLint loc = glGetUniformLocation(shad_program, "tex0");
-    if(loc == -1)
+    if(loc == -1 && false) // disable this shit because it is annoying af
     {
         std::cerr << "[ERROR]: Uniform not found!\n";
     }

@@ -53,6 +53,8 @@ app::~app()
     ImGui::DestroyContext();
     glfwDestroyWindow(window);
     s3gl::terminate();
+    s3gl::actor_manager::clear();
+    s3gl::asset_manager::clear();
 }
 
 void app::loop()
@@ -75,10 +77,12 @@ void app::loop()
     
     // new class (still heavy WIP)
     s3gl::scene scene1("assets/scenes/scene.json");
+    s3gl::scene scene2("assets/scenes/vibe_room.json");
+
+    scene1.load();
     
     // objects that actually do stuff
     s3gl::mesh& cube2 = scene1.get_mesh_ref("cube2");
-    s3gl::mesh& land  = scene1.get_mesh_ref("land");
     s3gl::mesh& cube3  = scene1.get_mesh_ref("cube3");
     
     
@@ -96,86 +100,172 @@ void app::loop()
     
     bool box_grounded = true;
     bool box_following = false;
-    s3gl::actor_manager::listen_pos(cam.pos, cam.get_orientation());
-    s3gl::actor_manager::play_actor(1LL);
+    bool next_scene = false;
     
+    s3gl::actor_manager::listen_pos(cam.pos, cam.get_orientation());
+
+    scene1.start();
+    scene1.set_stage(1);
     while(!glfwWindowShouldClose(window))
     {
-        glClearColor(b[0], b[1], b[2], 1.0f);
-        
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        light_col = glm::vec4(b2[0], b2[1], b2[2], 1.0f);
-        light_pos = cam.pos;
-        cube2.pos.x += (cam.pos.x - 2.0f - cube2.pos.x) / 50.0f;
-        cube2.pos.z += (cam.pos.z - 2.0f - cube2.pos.z) / 50.0f;
-        if(box_following)
+        if(scene1())
         {
-            if(box_grounded)
-                cube2.pos.y = land.get_height_data(cube2.pos) - 8.0f;
-            else
-                cube2.pos.y += (cam.pos.y - 2.0f - cube2.pos.y) / 50.0f;
+            glClearColor(b[0], b[1], b[2], 1.0f);
+            
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            light_col = glm::vec4(b2[0], b2[1], b2[2], 1.0f);
+            light_pos = cam.pos;
+            cube2.pos.x += (cam.pos.x - 2.0f - cube2.pos.x) / 50.0f;
+            cube2.pos.z += (cam.pos.z - 2.0f - cube2.pos.z) / 50.0f;
+            if(box_following)
+            {
+                // if(box_grounded)
+                //     cube2.pos.y = land->get_height_data(cube2.pos) - 8.0f;
+                // else
+                    cube2.pos.y += (cam.pos.y - 2.0f - cube2.pos.y) / 50.0f;
+            }
+
+            
+            cam.speed = rot_speed;
+
+            cube3.pos.z -= 0.03f;
+            
+            // if (!ImGui::GetIO().WantCaptureMouse)     
+                cam.inputs(window, 0); //land->get_height_data(cam.pos) - 5.0f);
+            cam.update_matrix(0.1f, 10000.0f);
+            
+            s3gl::actor_manager::listen_pos(cam.pos, cam.get_orientation());
+            // all s3gl rendering
+            s3gl::renderer::render(cam, glm::vec3(light_pos), glm::vec4(light_col), light_preset);
+            // ALL imgui rendering
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+
+            // colour picker
+            ImGui::Begin("Background Colour");
+            if(ImGui::Button("Print Something"))
+                std::cout << "something\n";
+            ImGui::ColorPicker3("Background Colour", b);
+            ImGui::ColorPicker3("Light Colour", b2);
+            ImGui::End();
+            // tri toggle
+            ImGui::Begin("Movement");
+            ImGui::SliderFloat("Speed", &rot_speed, 0.0f, 0.5f);
+            ImGui::SliderFloat("Gravity", &cam.gravity, 1.0f, 5.0f);
+            ImGui::SliderFloat("Sens", &cam.sens, 0.0f, 5.0f);
+            // ImGui::SliderFloat3("Light Pos", a, -10.0f, 10.0f);
+            ImGui::Checkbox("Grounded", &cam.grounded);
+            ImGui::Checkbox("Box Grounded", &box_grounded);
+            ImGui::End();
+
+            ImGui::Begin("Scene");
+            if(ImGui::Button("End Scene"))
+            next_scene = true;
+            if(ImGui::Button("Stage 1"))
+                scene1.set_stage(1);
+            if(ImGui::Button("Stage 2"))
+                scene1.set_stage(2);
+            ImGui::End();
+
+            // lighting
+            ImGui::Begin("Lighting");
+            if(ImGui::Button("Low Graphics"))
+                light_preset = (std::uint16_t)s3gl::engine::LIGHTING_NOLIGHT;
+            else if(ImGui::Button("Direct Light"))
+                light_preset = (std::uint16_t)s3gl::engine::LIGHTING_DIRECT;
+            else if(ImGui::Button("Point Light"))
+                light_preset = (std::uint16_t)s3gl::engine::LIGHTING_POINT;
+            else if(ImGui::Button("Spot Light"))
+                light_preset = (std::uint16_t)s3gl::engine::LIGHTING_SPOT;
+            else if(ImGui::Button("Sun Light"))
+                light_preset = (std::uint16_t)s3gl::engine::LIGHTING_SUN;
+            ImGui::End();
+            //fps
+            int fps = s3gl::calc_fps();
+            ImGui::Begin("FPS");
+            ImGui::Text("%d", fps);
+            ImGui::End();
+            // rendering
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+            
+            
+            // swap buffers 
+            glfwSwapBuffers(window);
+            // poll events
+            glfwPollEvents();
+            if(next_scene)
+            {
+                scene1.end();
+                scene2.load();
+                scene2.start();
+                // land = &scene2.get_mesh_ref("land");
+            }
         }
+        else if(scene2())
+        {
+            glClearColor(b[0], b[1], b[2], 1.0f);
+            
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        
-        cam.speed = rot_speed;
+            light_col = glm::vec4(b2[0], b2[1], b2[2], 1.0f);
+            light_pos = cam.pos; 
+            cam.speed = rot_speed;
 
-        cube3.pos.z -= 0.03f;
-        
-        // if (!ImGui::GetIO().WantCaptureMouse)     
-            cam.inputs(window, land.get_height_data(cam.pos) - 5.0f);
-        cam.update_matrix(0.1f, 10000.0f);
-        
-        s3gl::actor_manager::listen_pos(cam.pos, cam.get_orientation());
-        // all s3gl rendering
-        s3gl::renderer::render(cam, glm::vec3(light_pos), glm::vec4(light_col), light_preset);
-        // ALL imgui rendering
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
+            cam.inputs(window, 0); //land->get_height_data(cam.pos));
+            cam.update_matrix(0.1f, 10000.0f);
+            
+            s3gl::actor_manager::listen_pos(cam.pos, cam.get_orientation());
+            // all s3gl rendering
+            s3gl::renderer::render(cam, glm::vec3(light_pos), glm::vec4(light_col), light_preset);
+            // ALL imgui rendering
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
 
-        // colour picker
-        ImGui::Begin("Background Colour");
-        if(ImGui::Button("Print Something"))
-            std::cout << "something\n";
-        ImGui::ColorPicker3("Background Colour", b);
-        ImGui::ColorPicker3("Light Colour", b2);
-        ImGui::End();
-        // tri toggle
-        ImGui::Begin("Movement");
-        ImGui::SliderFloat("Speed", &rot_speed, 0.0f, 0.5f);
-        ImGui::SliderFloat("Gravity", &cam.gravity, 1.0f, 5.0f);
-        ImGui::SliderFloat("Sens", &cam.sens, 0.0f, 5.0f);
-        // ImGui::SliderFloat3("Light Pos", a, -10.0f, 10.0f);
-        ImGui::Checkbox("Grounded", &cam.grounded);
-        ImGui::Checkbox("Box Grounded", &box_grounded);
-        ImGui::End();
-        // lighting
-        ImGui::Begin("Lighting");
-        if(ImGui::Button("Low Graphics"))
-            light_preset = (std::uint16_t)s3gl::engine::LIGHTING_NOLIGHT;
-        else if(ImGui::Button("Direct Light"))
-            light_preset = (std::uint16_t)s3gl::engine::LIGHTING_DIRECT;
-        else if(ImGui::Button("Point Light"))
-            light_preset = (std::uint16_t)s3gl::engine::LIGHTING_POINT;
-        else if(ImGui::Button("Spot Light"))
-            light_preset = (std::uint16_t)s3gl::engine::LIGHTING_SPOT;
-        else if(ImGui::Button("Sun Light"))
-            light_preset = (std::uint16_t)s3gl::engine::LIGHTING_SUN;
-        ImGui::End();
-        //fps
-        int fps = s3gl::calc_fps();
-        ImGui::Begin("FPS");
-        ImGui::Text("%d", fps);
-        ImGui::End();
-        // rendering
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        
-        
-        // swap buffers 
-        glfwSwapBuffers(window);
-        // poll events
-        glfwPollEvents();
+            // colour picker
+            ImGui::Begin("Background Colour");
+            if(ImGui::Button("Print Something"))
+                std::cout << "something\n";
+            ImGui::ColorPicker3("Background Colour", b);
+            ImGui::ColorPicker3("Light Colour", b2);
+            ImGui::End();
+            // tri toggle
+            ImGui::Begin("Movement");
+            ImGui::SliderFloat("Speed", &rot_speed, 0.0f, 0.5f);
+            ImGui::SliderFloat("Gravity", &cam.gravity, 1.0f, 5.0f);
+            ImGui::SliderFloat("Sens", &cam.sens, 0.0f, 5.0f);
+            ImGui::Checkbox("Grounded", &cam.grounded);
+            ImGui::End();
+            // lighting
+            ImGui::Begin("Lighting");
+            if(ImGui::Button("Low Graphics"))
+                light_preset = (std::uint16_t)s3gl::engine::LIGHTING_NOLIGHT;
+            else if(ImGui::Button("Direct Light"))
+                light_preset = (std::uint16_t)s3gl::engine::LIGHTING_DIRECT;
+            else if(ImGui::Button("Point Light"))
+                light_preset = (std::uint16_t)s3gl::engine::LIGHTING_POINT;
+            else if(ImGui::Button("Spot Light"))
+                light_preset = (std::uint16_t)s3gl::engine::LIGHTING_SPOT;
+            else if(ImGui::Button("Sun Light"))
+                light_preset = (std::uint16_t)s3gl::engine::LIGHTING_SUN;
+            ImGui::End();
+            //fps
+            int fps = s3gl::calc_fps();
+            ImGui::Begin("FPS");
+            ImGui::Text("%d", fps);
+            ImGui::End();
+            // rendering
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+            
+            
+            // swap buffers 
+            glfwSwapBuffers(window);
+            // poll events
+            glfwPollEvents();
+        }
     }
 }

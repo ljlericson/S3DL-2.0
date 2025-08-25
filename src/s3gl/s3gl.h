@@ -28,6 +28,7 @@
 #include <array>
 #include <limits>
 #include <cmath>
+#include <chrono>
 // opengl
 #include <GL/glew.h>
 #include <glfw/glfw3.h>
@@ -63,6 +64,7 @@ namespace s3gl
     extern float last_time;
 
     typedef unsigned int uint;
+    using key_t = __int128_t;
 
     typedef enum
     {
@@ -83,6 +85,30 @@ namespace s3gl
         
     };
 
+    class exception
+    {
+    private:
+        std::string except;
+    public:
+        exception(const std::string& except);
+        std::string what();
+    }; 
+    
+    class timer 
+    {
+    public:
+        
+        timer();
+
+        void reset();
+
+        float since_started();
+
+        timer operator=(const timer& other);
+
+    private:
+        std::chrono::high_resolution_clock::time_point m_start;
+    };
 
     int init(int flags);
     
@@ -92,6 +118,8 @@ namespace s3gl
     // @return std::vector<std::string_view> string vector where elemets are individual
     // words that are sorted in order first appeared
     std::vector<std::string_view> split_string(std::string_view i, char separating_char);
+    
+    std::uint64_t fnv1a_hash(const void* data, std::size_t len);
 
     int calc_fps();
 
@@ -111,13 +139,5 @@ namespace s3gl
         std::string path;
     };
 
-    class exception
-    {
-    private:
-        std::string except;
-    public:
-        exception(const std::string& except);
-        std::string what();
-    }; 
 }
 

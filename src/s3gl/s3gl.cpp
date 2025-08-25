@@ -1,6 +1,29 @@
 #include "s3gl.h"
 
 float s3gl::last_time = 0.0f;
+// 64-bit FNV-1a parameters (standard, stable)
+static constexpr std::uint64_t FNV64_OFFSET = 14695981039346656037ull;
+static constexpr std::uint64_t FNV64_PRIME  = 1099511628211ull;
+
+s3gl::timer::timer()
+    : m_start(std::chrono::high_resolution_clock::now()) { }
+
+void s3gl::timer::reset()
+{
+    m_start = std::chrono::high_resolution_clock::now();
+}
+
+float s3gl::timer::since_started()
+{
+    return std::chrono::duration(std::chrono::high_resolution_clock::now() - m_start).count();
+}
+
+s3gl::timer s3gl::timer::operator=(const timer& other)
+{
+    // yes copying is intended here
+    m_start = other.m_start;
+    return *this;
+}
 
 int s3gl::init(int flags)
 {
@@ -55,6 +78,32 @@ std::vector<std::string_view> s3gl::split_string(std::string_view input, char se
     }
 
     return result;
+}
+
+
+std::uint64_t s3gl::fnv1a_hash(const void* data, std::size_t len)
+{
+    const unsigned char* p = static_cast<const unsigned char*>(data);
+    std::uint64_t h = FNV64_OFFSET;
+
+#if defined(__SIZEOF_INT128__)
+    // Use 128-bit intermediate multiply to give the compiler freedom to optimize
+    // (result is still reduced mod 2^64 by the cast, matching FNV-1a spec)
+    const unsigned __int128 P = static_cast<unsigned __int128>(FNV64_PRIME);
+    for (std::size_t i = 0; i < len; ++i) 
+    {
+        h ^= static_cast<std::uint64_t>(p[i]);
+        h = static_cast<std::uint64_t>(static_cast<unsigned __int128>(h) * P);
+    }
+#else
+    // Pure 64-bit fallback
+    for (std::size_t i = 0; i < len; ++i) 
+    {
+        h ^= static_cast<std::uint64_t>(p[i]);
+        h *= FNV64_PRIME;
+    }
+#endif
+    return h;
 }
 
 

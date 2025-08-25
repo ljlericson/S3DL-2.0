@@ -1,25 +1,51 @@
 {
+    "name":"land_scene",
     "shaders": {
         "shader1":["src/shaders/vert.glsl","src/shaders/frag.glsl"]
     },
     "textures": {
         "flower":["shader1", "assets/tex/2.jpg"],
-        "grass":["shader1", "assets/tex/grass.png"]
+        "grass1":["shader1", "assets/tex/grass.png"]
     },
     "objects": {
-        "torus":["./assets/obj/torus.obj", "flower", "shader1", [3.0, 3.0, -3.0]],
-        "torus1":["./assets/obj/torus.obj", "flower", "shader1", [3.0, 6.0, -3.0]],
-        "torus2":["./assets/obj/torus.obj", "flower", "shader1", [3.0, 9.0, -3.0]],
-        "torus3":["./assets/obj/torus.obj", "flower", "shader1", [3.0, 12.0, -3.0]],
-        "cone":["./assets/obj/cone.obj", "grass", "shader1", [-3.0, -2.0, 3.0]],
-        "land":["./assets/obj/terrain.obj", "grass", "shader1", [0.0, -10.0, 0.0]],
-        "cube2":["./assets/obj/cube.obj", "flower", "shader1", [0.0, 2.0, 0.0]],
-        "cube3":["./assets/obj/cube.obj", "flower", "shader1", [0.0, -10.0, 0.0]]
+        "torus":  ["./assets/obj/torus.obj"  , "flower", "shader1"],
+        "torus1": ["./assets/obj/torus.obj"  , "flower", "shader1"],
+        "torus2": ["./assets/obj/torus.obj"  , "flower", "shader1"],
+        "torus3": ["./assets/obj/torus.obj"  , "flower", "shader1"],
+        "cone":   ["./assets/obj/cone.obj"   , "grass1", "shader1"],
+        "cube2":  ["./assets/obj/cube.obj"   , "flower", "shader1"], 
+        "cube3":  ["./assets/obj/cube.obj"   , "flower", "shader1"]
     },
-    "events": {
-        "sound": {
-            "music":["./assets/audio/drums.wav", [10, 50, 0], null],
-            "music2":["./assets/audio/music.wav", [0, 50, 0], null]
+    "audio": {
+        "classical":"./assets/audio/music.wav",
+        "classical1":"./assets/audio/music.wav"
+    },
+    "sound_actors": {
+        "music2":["classical", "torus"],
+        "music3":["classical", "torus1"]
+    },
+    "number_of_stages": 2,
+    "stages": {
+        "1": {
+            "objects": {
+                "torus": [3.0, 3.0, -3.0],
+                "torus1": [3.0, 9.0, -3.0]
+            },
+            "sound_actors": {
+                "music2": [0, 50, 0],
+                "music3": [0, 50, -50] 
+            },
+            "events": {
+
+            }
+        },
+        "2": {
+            "objects": {
+                "torus": [3.0, 3.0, -3.0]
+            },
+            "sound_actors": {
+                "music2": [0, 50, 0]
+            }
         }
     }
 }

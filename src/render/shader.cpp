@@ -41,7 +41,7 @@ s3gl::shader::shader(std::string_view fpathVert, std::string_view fpathFrag)
 s3gl::shader::shader(const shader& other)
     : ms_shader_frag(other.ms_shader_frag), ms_shader_vert(other.ms_shader_vert), m_inited(other.m_inited)
 {
-    std::cout << "Shader Copied\n";
+
 }
 
 void s3gl::shader::build()

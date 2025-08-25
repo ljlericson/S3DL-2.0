@@ -6,19 +6,19 @@ namespace s3gl
     {
     private:
         // vertex data
-        std::size_t num_verts;
-        std::vector<float> vert_data;
+        std::size_t m_num_verts;
         std::vector<glm::vec3> m_verts;
         // texture data
-        texture objTex;
+        texture m_tex;
         // vertex buffer objects
-        VAO vao;
-        VBO vbo;
+        VAO m_vao;
+        VBO m_vbo;
         shader m_shad;
         // variables
-        bool has_init;
-        glm::mat4 model;
+        bool m_init;
+        glm::mat4 m_model;
     public:
+        bool add_to_render_list; // sneaky reference to s3dl here
         glm::vec3 pos;
         mesh();
         mesh(const std::string& objfpath, const s3gl::shader& shad, s3gl::texture& tex, glm::vec3 pos);

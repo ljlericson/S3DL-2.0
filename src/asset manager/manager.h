@@ -5,14 +5,11 @@ namespace s3gl
 {
     class asset_manager
     {
-    private:
-        static inline std::unordered_map<std::size_t, std::unique_ptr<shader>> sm_shaders;
-        static inline std::unordered_map<std::size_t, std::unique_ptr<texture>> sm_textures;
-        static inline std::unordered_map<std::size_t, std::unique_ptr<mesh>> sm_meshes;
-        static inline std::unordered_map<std::size_t, ALuint> sm_audio_buffers;
-        static inline std::hash<std::string> sm_hasher;
-        static asset_manager sm_instance;
     public:
+        // simple struct for audio buffer
+        // that deletes buffer upon
+        // destruction
+        struct audio_buffer { ALuint id; audio_buffer(ALuint id); ~audio_buffer(); };
         // make code clearer because size_t
         // representing an object could be
         // confusing
@@ -42,8 +39,25 @@ namespace s3gl
         static std::size_t get_mesh_hash(std::string_view name);
         static std::size_t get_shad_hash(std::string_view name);
         static std::size_t get_tex_hash(std::string_view name);
+        static std::size_t get_WAV_hash(std::string_view name);
         static const std::unordered_map<std::size_t, std::unique_ptr<mesh>>& get_mesh_map();
         static void rm_mesh(std::size_t hash);
         static void clear();
+
+    private:
+        // shader storage with key map
+        static inline std::unordered_map<std::size_t, std::unique_ptr<shader>> sm_shaders;
+        static inline std::unordered_map<std::string, std::size_t> sm_shader_key_map;
+        // texture storage with key map
+        static inline std::unordered_map<std::size_t, std::unique_ptr<texture>> sm_textures;
+        static inline std::unordered_map<std::string, std::size_t> sm_texture_key_map;
+        // mesh storage with key map
+        static inline std::unordered_map<std::size_t, std::unique_ptr<mesh>> sm_meshes;
+        static inline std::unordered_map<std::string, std::size_t> sm_mesh_key_map;
+        // audio_buffer storage with key map
+        static inline std::unordered_map<std::size_t, std::unique_ptr<audio_buffer>> sm_audio_buffers;
+        static inline std::unordered_map<std::string, std::size_t> sm_audio_key_map;
+
+        static asset_manager sm_instance;
     };
 }

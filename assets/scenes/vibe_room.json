@@ -1,0 +1,25 @@
+{
+    "name":"vibe_room",
+    "shaders": {
+        "shader1":["src/shaders/vert.glsl","src/shaders/frag.glsl"]
+    },
+    "textures": {
+        "flower":["shader1", "assets/tex/2.jpg"],
+        "grass":["shader1", "assets/tex/grass.png"]
+    },
+    "objects": {
+        "land":["./assets/obj/terrain.obj", "flower", "shader1", [0.0, -50.0, 0.0]],
+        "torus":["./assets/obj/torus.obj", "flower", "shader1", [3.0, 4.0, -3.0]],
+        "torus1":["./assets/obj/torus.obj", "grass", "shader1", [3.0, 8.0, -3.0]],
+        "torus2":["./assets/obj/torus.obj", "flower", "shader1", [3.0, 12.0, -3.0]],
+        "torus3":["./assets/obj/torus.obj", "grass", "shader1", [3.0, 26.0, -3.0]]
+    },
+    "audio": {
+        "drums":"./assets/audio/drums.wav"
+    },
+    "events": {
+        "sound_actors": {
+            "music2":["drums", [0, 0, 0], "torus1"]
+        }
+    }
+}
